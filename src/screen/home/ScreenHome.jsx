@@ -1,12 +1,16 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View, ScrollView } from "react-native";
+import React from "react";
 
 export default function ScreenHome() {
   return (
-    <View>
-      <Text>ScreenHome</Text>
-    </View>
-  )
+    <ScrollView>
+      <View>
+          <Text>Inicio</Text>
+      </View>
+    </ScrollView>
+  );
 }
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  
+});
