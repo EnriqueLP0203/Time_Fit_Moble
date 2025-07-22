@@ -1,25 +1,42 @@
-import { StyleSheet, Text, View, ScrollView } from "react-native";
+import { StyleSheet, Text, View, ScrollView, Switch } from "react-native";
 import React from "react";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function ScreenHome() {
+  const { isDarkMode, toggleTheme, colors } = useTheme();
+
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Inicio</Text>
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Membresías vendidas</Text>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={styles.header}>
+        <Text style={[styles.title, { color: colors.text }]}>Inicio</Text>
+        <View style={styles.themeSwitch}>
+          <Text style={[styles.switchLabel, { color: colors.text }]}>
+            {isDarkMode ? '🌙' : '☀️'}
+          </Text>
+          <Switch
+            value={isDarkMode}
+            onValueChange={toggleTheme}
+            trackColor={{ false: '#767577', true: '#81b0ff' }}
+            thumbColor={isDarkMode ? '#f5dd4b' : '#f4f3f4'}
+          />
+        </View>
+      </View>
+
+      <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <Text style={[styles.cardTitle, { color: colors.text }]}>Membresías vendidas</Text>
         {/* Puedes agregar aquí un número, gráfico, etc */}
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Total de miembros</Text>
+      <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <Text style={[styles.cardTitle, { color: colors.text }]}>Total de miembros</Text>
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Total de Colaboradores</Text>
+      <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <Text style={[styles.cardTitle, { color: colors.text }]}>Total de Colaboradores</Text>
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Ventas totales</Text>
+      <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <Text style={[styles.cardTitle, { color: colors.text }]}>Ventas totales</Text>
       </View>
 
     </ScrollView>
@@ -30,29 +47,39 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#000000ff", // Fondo claro general
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
-    color: "#FFFFFF", // Título en blanco
+  },
+  themeSwitch: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  switchLabel: {
+    marginRight: 10,
+    fontSize: 20,
   },
   card: {
-    backgroundColor: "#45474B",
     borderRadius: 20,
-    padding: 20, // Espacio interno
+    padding: 20,
     marginBottom: 20,
     width: "100%",
-    height: 150, // Altura fija para el card
+    height: 150,
+    borderWidth: 1,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 4, // Para Android
+    elevation: 3,
   },
   cardTitle: {
-    color: "#fff",
     fontSize: 14,
     fontWeight: "600",
   },

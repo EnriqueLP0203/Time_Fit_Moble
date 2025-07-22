@@ -26,6 +26,7 @@ function MyStack() {
 }
 
 function MyTabs() {
+  const { colors } = useTheme();
   return (
     <Tabs.Navigator
       screenOptions={({ route }) => ({
@@ -55,8 +56,25 @@ function MyTabs() {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: "tomato",
-        tabBarInactiveTintColor: "gray",
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.tabInactive,
+        tabBarStyle: {
+          backgroundColor: colors.background,
+          borderTopWidth: 0.5,
+          borderTopColor: colors.border,
+          elevation: 0,
+          height: 60,
+        },
+        headerStyle: {
+          backgroundColor: colors.background,
+          elevation: 0,
+          shadowOpacity: 0,
+        },
+        headerTintColor: colors.text,
+        tabBarLabelStyle: {
+          marginBottom: 5,
+          fontSize: 12,
+        },
       })}
     >
       <Tabs.Screen name="Home" component={ScreenHome} />
@@ -68,10 +86,41 @@ function MyTabs() {
   );
 }
 
-export default function Navegacion() {
+import { ThemeProvider, useTheme } from './src/context/ThemeContext';
+
+function NavigationContent() {
+  const { colors } = useTheme();
   return (
     <NavigationContainer>
-      <MyTabs />
+      <Stack.Navigator
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: colors.background,
+          },
+          headerTintColor: colors.text,
+        }}>
+        <Stack.Screen 
+          name="MainTabs" 
+          component={MyTabs} 
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen 
+          name="CrearCuenta" 
+          component={ScreenCrearCuenta}
+        />
+        <Stack.Screen 
+          name="Login" 
+          component={ScreenLogin}
+        />
+      </Stack.Navigator>
     </NavigationContainer>
+  );
+}
+
+export default function Navegacion() {
+  return (
+    <ThemeProvider>
+      <NavigationContent />
+    </ThemeProvider>
   );
 }
