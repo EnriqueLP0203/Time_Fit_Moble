@@ -4,7 +4,9 @@ import React from 'react'
 export default function GestionMembresias() {
   return (
     <View>
-      <Text>GestionMembresias</Text>
+      <Text>Membresias</Text>
+      <Text>Agrega una nueva membresia</Text>
+      
     </View>
   )
 }
