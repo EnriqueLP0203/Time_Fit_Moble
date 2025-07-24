@@ -62,8 +62,14 @@ function MyTabs() {
           backgroundColor: colors.background,
           borderTopWidth: 0.5,
           borderTopColor: colors.border,
-          elevation: 0,
           height: 60,
+          position: 'absolute',
+          bottom: 20,
+          left: 20,
+          right: 20,
+          borderRadius: 15,
+          elevation: 5,
+          paddingBottom: 10,
         },
         headerStyle: {
           backgroundColor: colors.background,
@@ -86,7 +92,7 @@ function MyTabs() {
   );
 }
 
-import { ThemeProvider, useTheme } from './src/context/ThemeContext';
+import { ThemeProvider, useTheme } from './src/context/ThemeContext'; //importacion de context donde se almacena el tema oscuro y claro
 
 function NavigationContent() {
   const { colors } = useTheme();
