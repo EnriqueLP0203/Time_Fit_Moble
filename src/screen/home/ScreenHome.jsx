@@ -6,7 +6,7 @@ export default function ScreenHome() {
   const { isDarkMode, toggleTheme, colors } = useTheme();
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}> 
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.text }]}>Inicio</Text>
         <View style={styles.themeSwitch}>
@@ -22,20 +22,20 @@ export default function ScreenHome() {
         </View>
       </View>
 
-      <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+      <View style={[styles.card, { backgroundColor: isDarkMode ? '#45474B' : colors.card, borderColor: colors.border }]}> 
         <Text style={[styles.cardTitle, { color: colors.text }]}>Membresías vendidas</Text>
         {/* Puedes agregar aquí un número, gráfico, etc */}
       </View>
 
-      <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+      <View style={[styles.card, { backgroundColor: isDarkMode ? '#45474B' : colors.card, borderColor: colors.border }]}> 
         <Text style={[styles.cardTitle, { color: colors.text }]}>Total de miembros</Text>
       </View>
 
-      <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+      <View style={[styles.card, { backgroundColor: isDarkMode ? '#45474B' : colors.card, borderColor: colors.border }]}> 
         <Text style={[styles.cardTitle, { color: colors.text }]}>Total de Colaboradores</Text>
       </View>
 
-      <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+      <View style={[styles.card, { backgroundColor: isDarkMode ? '#45474B' : colors.card, borderColor: colors.border }]}> 
         <Text style={[styles.cardTitle, { color: colors.text }]}>Ventas totales</Text>
       </View>
 
