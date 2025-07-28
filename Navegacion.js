@@ -1,38 +1,33 @@
+import React from 'react';
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-const Stack = createStackNavigator();
-
-const Tabs = createBottomTabNavigator();
+import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 
 import ScreenHome from "./src/screen/home/ScreenHome";
-import ScreenCrearCuenta from "./src/screen//login/ScreenCrearCuenta";
+import ScreenCrearCuenta from "./src/screen/login/ScreenCrearCuenta";
 import ScreenLogin from "./src/screen/login/ScreenLogin";
 
 import Colaboradores from "./src/screen/Colaboradores";
-import GestionMembresias from "./src/screen/GestionMembresias";
+import GestionMembresias from "./src/screen/membresias/GestionMembresias";
 import GestionMiembros from "./src/screen/GestionMiembros";
 import GestionVentas from "./src/screen/GestionVentas";
+import CrearMembresia from "./src/screen/membresias/CrearMembresia";
+import DetalleMembresia from "./src/screen/membresias/DetalleMembresia";
 
-function MyStack() {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen name="CrearCuenta" component={ScreenCrearCuenta} />
-      <Stack.Screen name="Login" component={ScreenLogin} />
-    </Stack.Navigator>
-  );
-}
+const Stack = createStackNavigator();
+const Tabs = createBottomTabNavigator();
 
 function MyTabs() {
   const { colors } = useTheme();
+
   return (
     <Tabs.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
-
           switch (route.name) {
             case "Home":
               iconName = focused ? "home" : "home-outline";
@@ -49,11 +44,9 @@ function MyTabs() {
             case "Ventas":
               iconName = focused ? "cash" : "cash-outline";
               break;
-
             default:
               iconName = "alert-circle";
           }
-
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: colors.primary,
@@ -92,32 +85,26 @@ function MyTabs() {
   );
 }
 
-import { ThemeProvider, useTheme } from './src/context/ThemeContext'; //importacion de context donde se almacena el tema oscuro y claro
-
 function NavigationContent() {
   const { colors } = useTheme();
+
   return (
     <NavigationContainer>
       <Stack.Navigator
         screenOptions={{
-          headerStyle: {
-            backgroundColor: colors.background,
-          },
+          headerStyle: { backgroundColor: colors.background },
           headerTintColor: colors.text,
-        }}>
-        <Stack.Screen 
-          name="MainTabs" 
-          component={MyTabs} 
+        }}
+      >
+        <Stack.Screen
+          name="MainTabs"
+          component={MyTabs}
           options={{ headerShown: false }}
         />
-        <Stack.Screen 
-          name="CrearCuenta" 
-          component={ScreenCrearCuenta}
-        />
-        <Stack.Screen 
-          name="Login" 
-          component={ScreenLogin}
-        />
+        <Stack.Screen name="CrearCuenta" component={ScreenCrearCuenta} />
+        <Stack.Screen name="Login" component={ScreenLogin} />
+        <Stack.Screen name="CrearMembresia" component={CrearMembresia} />
+        <Stack.Screen name="DetalleMembresia" component={DetalleMembresia} />
       </Stack.Navigator>
     </NavigationContainer>
   );
