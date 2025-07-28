@@ -1,18 +1,23 @@
-import { StyleSheet, Text, View } from 'react-native';
+// GestionMiembros.jsx
+import { StyleSheet, Text, View, Modal, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { Avatar, Card, Checkbox, Button } from 'react-native-paper';
-import { useTheme } from '../context/ThemeContext'; // Asumiendo que este context existe en tu proyecto
+import { useTheme } from '../context/ThemeContext';
+import { useNavigation } from '@react-navigation/native';
 
 export default function GestionMiembros() {
   const [isSelecting, setIsSelecting] = React.useState(false);
   const [checked, setChecked] = React.useState(false);
   const [isActive, setIsActive] = React.useState(true);
-  const { colors, isDarkMode } = useTheme(); // Usando el contexto de tema
+  const [isInfoModalVisible, setIsInfoModalVisible] = React.useState(false);
+
+  const { colors, isDarkMode } = useTheme();
+  const navigation = useNavigation();
 
   const toggleSelectionMode = () => {
     setIsSelecting(!isSelecting);
     if (isSelecting) {
-      setChecked(false); // Resetear checkbox al cancelar
+      setChecked(false);
     }
   };
 
@@ -20,8 +25,25 @@ export default function GestionMiembros() {
     setIsActive(!isActive);
   };
 
+  const openInfoModal = () => {
+    setIsInfoModalVisible(true);
+  };
+
+  const closeInfoModal = () => {
+    setIsInfoModalVisible(false);
+  };
+
+  // Función para navegar a la pantalla de información detallada DESDE EL MODAL
+  const navigateToMemberInfoScreenFromModal = () => {
+    closeInfoModal(); // Primero cierra el modal
+    navigation.navigate('Info', {
+      memberTitle: "Nombre Miembro Completo", // Datos de ejemplo para la pantalla
+      memberSubtitle: "Detalles del Plan",    // Datos de ejemplo para la pantalla
+    });
+  };
+
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }] }>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.headerContainer}>
         <Button
           mode="contained"
@@ -34,7 +56,11 @@ export default function GestionMiembros() {
         </Button>
       </View>
 
-      <Card style={[styles.card, { backgroundColor: isDarkMode ? '#45474B' : colors.card }]}>
+      <Card
+        style={[styles.card, { backgroundColor: isDarkMode ? '#45474B' : colors.card }]}
+        // ELIMINADO: onPress={navigateToMemberInfoScreen}
+        // La Card ya no navegará a la pantalla completa al hacer click
+      >
         <Card.Title
           title="Card Title"
           titleStyle={[styles.title, { color: colors.text, marginLeft: isSelecting ? 40 : 0 }]}
@@ -68,10 +94,10 @@ export default function GestionMiembros() {
                 <>
                   <Button
                     mode="outlined"
-                    onPress={() => console.log('Botón Info presionado')}
+                    onPress={openInfoModal}
                     textColor={colors.primary}
-                    style={[styles.button, { borderColor: colors.primary, borderWidth: 0.8 }]}
-                    labelStyle={[styles.buttonLabel, { color: colors.primary }]}
+                    style={[styles.button, { borderColor: colors.primary, borderWidth: 1.5, backgroundColor: colors.background }]}
+                    labelStyle={[styles.buttonLabel, { color: colors.primary, fontWeight: '600' }]}
                     compact={true}
                   >
                     Info
@@ -79,12 +105,12 @@ export default function GestionMiembros() {
                   <Button
                     mode="contained"
                     onPress={toggleActive}
-                    buttonColor={isActive ? colors.primary : "#666666"}
-                    labelStyle={[styles.buttonLabel, { color: 'white' }]}
+                    buttonColor={isActive ? colors.primary : "#757575"}
+                    labelStyle={[styles.buttonLabel, { color: 'white', fontWeight: '600' }]}
                     style={styles.button}
                     compact={true}
                   >
-                    {isActive ? "On" : "Off"}
+                    {isActive ? "Activo" : "Inactivo"}
                   </Button>
                 </>
               )}
@@ -92,6 +118,43 @@ export default function GestionMiembros() {
           )}
         />
       </Card>
+
+      {/* --- EL COMPONENTE MODAL --- */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isInfoModalVisible}
+        onRequestClose={closeInfoModal}
+      >
+        <View style={styles.centeredView}>
+          <View style={[styles.modalView, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Información Breve del Miembro</Text>
+            <Text style={[styles.modalText, { color: colors.text }]}>Nombre: [Nombre del Miembro]</Text>
+            <Text style={[styles.modalText, { color: colors.text }]}>Estado: [Activo/Inactivo]</Text>
+            <Text style={[styles.modalText, { color: colors.text }]}>Último pago: [Fecha]</Text>
+            <Text style={[styles.modalText, { color: colors.text }]}>Membresía: [Tipo]</Text>
+
+            <Button
+              mode="contained"
+              onPress={navigateToMemberInfoScreenFromModal} // ¡Este botón ahora navega a la pantalla completa!
+              buttonColor={colors.primary}
+              labelStyle={{ color: 'white' }}
+              style={styles.modalButton}
+            >
+              Ver Detalles
+            </Button>
+            <Button
+              mode="text" // Añadimos un botón de cerrar el modal sin navegar
+              onPress={closeInfoModal}
+              textColor={colors.primary}
+              labelStyle={{ fontSize: 14 }}
+              style={{ marginTop: 10 }}
+            >
+              Cerrar
+            </Button>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -164,5 +227,36 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     letterSpacing: 0,
     textAlign: 'center',
+  },
+  // --- Estilos para el Modal ---
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalView: {
+    margin: 20,
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    elevation: 5,
+    borderWidth: 1,
+  },
+  modalTitle: {
+    marginBottom: 15,
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 10,
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  modalButton: {
+    marginTop: 20,
+    borderRadius: 10,
+    paddingHorizontal: 20,
   },
 });
