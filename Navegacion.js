@@ -7,14 +7,14 @@ const Stack = createStackNavigator();
 
 const Tabs = createBottomTabNavigator();
 
-import ScreenHome from "./src/screen/home/ScreenHome";
-import ScreenCrearCuenta from "./src/screen//login/ScreenCrearCuenta";
+import { AuthContext } from "./src/context/authContext";
 import ScreenLogin from "./src/screen/login/ScreenLogin";
+import ScreenCrearCuenta from "./src/screen//login/ScreenCrearCuenta";
 
-import Colaboradores from "./src/screen/Colaboradores";
+import ScreenHome from "./src/screen/home/ScreenHome";
 import GestionMembresias from "./src/screen/GestionMembresias";
 import GestionMiembros from "./src/screen/GestionMiembros";
-import GestionVentas from "./src/screen/GestionVentas";
+import Perfil from "./src/screen/Perfil";
 
 function MyStack() {
   return (
@@ -37,18 +37,17 @@ function MyTabs() {
             case "Home":
               iconName = focused ? "home" : "home-outline";
               break;
-            case "Colaboradores":
-              iconName = focused ? "people" : "people-outline";
-              break;
+
             case "Membresias":
               iconName = focused ? "card" : "card-outline";
               break;
-            case "Miembros":
+            case "Clientes":
               iconName = focused ? "person" : "person-outline";
               break;
-            case "Ventas":
-              iconName = focused ? "cash" : "cash-outline";
+            case "Perfil":
+              iconName = focused ? "person-circle-sharp" : "person-circle-outline";
               break;
+
 
             default:
               iconName = "alert-circle";
@@ -63,7 +62,7 @@ function MyTabs() {
           borderTopWidth: 0.5,
           borderTopColor: colors.border,
           height: 60,
-          position: 'absolute',
+          position: "absolute",
           bottom: 20,
           left: 20,
           right: 20,
@@ -84,15 +83,15 @@ function MyTabs() {
       })}
     >
       <Tabs.Screen name="Home" component={ScreenHome} />
-      <Tabs.Screen name="Colaboradores" component={Colaboradores} />
       <Tabs.Screen name="Membresias" component={GestionMembresias} />
-      <Tabs.Screen name="Miembros" component={GestionMiembros} />
-      <Tabs.Screen name="Ventas" component={GestionVentas} />
+      <Tabs.Screen name="Clientes" component={GestionMiembros} />
+      <Tabs.Screen name="Perfil" component={Perfil} />
     </Tabs.Navigator>
   );
 }
 
-import { ThemeProvider, useTheme } from './src/context/ThemeContext'; //importacion de context donde se almacena el tema oscuro y claro
+import { ThemeProvider, useTheme } from "./src/context/ThemeContext"; //importacion de context donde se almacena el tema oscuro y claro
+import { useContext } from "react";
 
 function NavigationContent() {
   const { colors } = useTheme();
@@ -104,29 +103,34 @@ function NavigationContent() {
             backgroundColor: colors.background,
           },
           headerTintColor: colors.text,
-        }}>
-        <Stack.Screen 
-          name="MainTabs" 
-          component={MyTabs} 
+        }}
+      >
+        <Stack.Screen
+          name="MainTabs"
+          component={MyTabs}
           options={{ headerShown: false }}
         />
-        <Stack.Screen 
-          name="CrearCuenta" 
-          component={ScreenCrearCuenta}
-        />
-        <Stack.Screen 
-          name="Login" 
-          component={ScreenLogin}
-        />
+        <Stack.Screen name="CrearCuenta" component={ScreenCrearCuenta} />
+        <Stack.Screen name="Login" component={ScreenLogin} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
 
 export default function Navegacion() {
+  const { userToken, loading } = useContext(AuthContext);
+
+  if (loading) return null;
   return (
-    <ThemeProvider>
-      <NavigationContent />
-    </ThemeProvider>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      {userToken ? (
+        <Stack.Screen name="MainTabs" component={MyTabs} />
+      ) : (
+        <>
+          <Stack.Screen name="Login" component={ScreenLogin} />
+          <Stack.Screen name="CrearCuenta" component={ScreenCrearCuenta} />
+        </>
+      )}
+    </Stack.Navigator>
   );
 }
