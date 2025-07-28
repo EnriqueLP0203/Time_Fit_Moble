@@ -3,7 +3,7 @@ import React from 'react';
 import { Avatar, Card, Checkbox, Button } from 'react-native-paper';
 import { useTheme } from '../context/ThemeContext'; // Asumiendo que este context existe en tu proyecto
 
-export default function Colaboradores() {
+export default function GestionMiembros() {
   const [isSelecting, setIsSelecting] = React.useState(false);
   const [checked, setChecked] = React.useState(false);
   const [isActive, setIsActive] = React.useState(true);
