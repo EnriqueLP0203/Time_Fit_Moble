@@ -2,6 +2,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useTheme } from './src/context/ThemeContext';
 
 const Stack = createStackNavigator();
 
@@ -30,32 +31,6 @@ function MyTabs() {
   return (
     <Tabs.Navigator
       screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-
-          switch (route.name) {
-            case "Home":
-              iconName = focused ? "home" : "home-outline";
-              break;
-            case "Colaboradores":
-              iconName = focused ? "people" : "people-outline";
-              break;
-            case "Membresias":
-              iconName = focused ? "card" : "card-outline";
-              break;
-            case "Miembros":
-              iconName = focused ? "person" : "person-outline";
-              break;
-            case "Ventas":
-              iconName = focused ? "cash" : "cash-outline";
-              break;
-
-            default:
-              iconName = "alert-circle";
-          }
-
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.tabInactive,
         tabBarStyle: {
@@ -81,6 +56,29 @@ function MyTabs() {
           marginBottom: 5,
           fontSize: 12,
         },
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+          switch (route.name) {
+            case "Home":
+              iconName = focused ? "home" : "home-outline";
+              break;
+            case "Colaboradores":
+              iconName = focused ? "people" : "people-outline";
+              break;
+            case "Membresias":
+              iconName = focused ? "card" : "card-outline";
+              break;
+            case "Miembros":
+              iconName = focused ? "person" : "person-outline";
+              break;
+            case "Ventas":
+              iconName = focused ? "cash" : "cash-outline";
+              break;
+            default:
+              iconName = "alert-circle";
+          }
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
       })}
     >
       <Tabs.Screen name="Home" component={ScreenHome} />
@@ -92,7 +90,7 @@ function MyTabs() {
   );
 }
 
-import { ThemeProvider, useTheme } from './src/context/ThemeContext'; //importacion de context donde se almacena el tema oscuro y claro
+import { ThemeProvider } from './src/context/ThemeContext'; //importacion de context donde se almacena el tema oscuro y claro
 
 function NavigationContent() {
   const { colors } = useTheme();
