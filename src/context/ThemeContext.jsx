@@ -8,26 +8,44 @@ export const ThemeProvider = ({ children }) => {
   const lightTheme = {
     dark: false,
     colors: {
-      primary: '#FF9100', // naranja
+      primary: '#FF6B00',
+      secondary: '#FF9100',
       background: '#FFFFFF',
       card: '#FFFFFF',
       text: '#000000',
+      textSecondary: '#666666',
       border: '#E5E5E5',
-      notification: '#FF9100', // naranja
+      inputBackground: '#F8F9FA',
+      notification: '#FF6B00',
       tabInactive: '#BDBDBD',
+      success: '#4CAF50',
+      error: '#F44336',
+      warning: '#FF9800',
+      info: '#2196F3',
+      modalOverlay: 'rgba(0, 0, 0, 0.5)',
+      shadow: 'rgba(0, 0, 0, 0.1)',
     },
   };
 
   const darkTheme = {
     dark: true,
     colors: {
-      primary: '#FF9100', // naranja
-      background: '#000000',
-      card: '#45474B',
+      primary: '#FF6B00',
+      secondary: '#FF9100',
+      background: '#121212',
+      card: '#1E1E1E',
       text: '#FFFFFF',
-      border: '#38383A',
-      notification: '#FF9100', // naranja
+      textSecondary: '#B0B0B0',
+      border: '#2C2C2C',
+      inputBackground: '#2A2A2A',
+      notification: '#FF6B00',
       tabInactive: '#757575',
+      success: '#4CAF50',
+      error: '#F44336',
+      warning: '#FF9800',
+      info: '#2196F3',
+      modalOverlay: 'rgba(0, 0, 0, 0.7)',
+      shadow: 'rgba(0, 0, 0, 0.3)',
     },
   };
 

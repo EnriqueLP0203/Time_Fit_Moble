@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   View,
   Text,
@@ -9,9 +9,13 @@ import {
   StatusBar,
   Alert,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from "@react-navigation/native";
+
+import {AuthContext} from '../../context/authContext'
 
 const ScreenCrearCuenta = ({ navigation }) => {
   const [formData, setFormData] = useState({
@@ -24,8 +28,13 @@ const ScreenCrearCuenta = ({ navigation }) => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const rutas = useNavigation();
   
+  const { register } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
+
+  console.log('🔍 Contexto de autenticación:', register ? 'Disponible' : 'No disponible');
+  console.log('🧭 Navegación disponible:', navigation ? 'Sí' : 'No');
+
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -35,207 +44,227 @@ const ScreenCrearCuenta = ({ navigation }) => {
   };
 
   const validateForm = () => {
-    const { nombre, apellido, nombreUsuario, correo, contrasena, confirmarContrasena } = formData;
+    console.log('🔍 Validando formulario...');
+    console.log('📝 Datos a validar:', formData);
+    
+    if (!formData.nombre || !formData.apellido || !formData.nombreUsuario || !formData.correo || !formData.contrasena || !formData.confirmarContrasena) {
+      console.log('❌ Campos vacíos detectados');
+      Alert.alert('Error', 'Todos los campos son obligatorios');
+      return false;
+    }
 
-    if (!nombre.trim()) {
-      Alert.alert('Error', 'El nombre es requerido');
-      return false;
-    }
-    if (!apellido.trim()) {
-      Alert.alert('Error', 'El apellido es requerido');
-      return false;
-    }
-    if (!nombreUsuario.trim()) {
-      Alert.alert('Error', 'El nombre de usuario es requerido');
-      return false;
-    }
-    if (!correo.trim()) {
-      Alert.alert('Error', 'El correo es requerido');
-      return false;
-    }
-    if (!contrasena) {
-      Alert.alert('Error', 'La contraseña es requerida');
-      return false;
-    }
-    if (contrasena !== confirmarContrasena) {
+    if (formData.contrasena !== formData.confirmarContrasena) {
+      console.log('❌ Contraseñas no coinciden');
       Alert.alert('Error', 'Las contraseñas no coinciden');
       return false;
     }
 
-    // Validación de email básica
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(correo)) {
-      Alert.alert('Error', 'Por favor ingresa un correo válido');
-      return false;
-    }
-
-    // Validación de contraseña (mínimo 6 caracteres)
-    if (contrasena.length < 6) {
+    if (formData.contrasena.length < 6) {
+      console.log('❌ Contraseña muy corta');
       Alert.alert('Error', 'La contraseña debe tener al menos 6 caracteres');
       return false;
     }
 
+    console.log('✅ Validación exitosa');
     return true;
   };
 
-  const handleRegister = () => {
-    if (!validateForm()) return;
+  const handleRegister = async() => {
+    console.log('🔄 Botón de registro presionado');
+    console.log('📝 Datos del formulario:', formData);
+    console.log('🧭 Navegación disponible:', navigation ? 'Sí' : 'No');
+    
+    if (!validateForm()) {
+      console.log('❌ Validación falló');
+      return;
+    }
 
-    // Aquí iría tu lógica de registro
-    console.log('Register attempt:', formData);
-    Alert.alert('Éxito', 'Cuenta creada exitosamente');
+    console.log('✅ Validación exitosa, iniciando registro...');
+    setLoading(true);
+    try{
+      console.log('📤 Llamando función register...');
+      await register(formData.nombre, formData.apellido, formData.nombreUsuario, formData.correo, formData.contrasena);
+      console.log('✅ Registro exitoso, navegando al home...');
+      
+      // Navegar directamente al home después del registro exitoso
+      console.log('🧭 Intentando navegar a MainTabs...');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'MainTabs' }],
+      });
+      console.log('✅ Navegación ejecutada');
+      
+    }catch(error){
+      console.log('❌ Error en registro:', error.message);
+      Alert.alert('Error', error.message);
+    } finally {
+      console.log('🏁 Finalizando handleRegister');
+      setLoading(false);
+    }
   };
 
-  const handleGoogleRegister = () => {
-    // Aquí iría tu lógica de registro con Google
-    console.log('Google register attempt');
-  };
 
-  const handleBackToLogin = () => {
-    // Navegar de vuelta al login
-    // navigation.goBack();
-    console.log('Navigate back to login');
-  };
+
+
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#000000" />
-      
 
-
-      <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-        {/* Logo Section */}
-        <View style={styles.logoSection}>
-          <View style={styles.logoContainer}>
-            <Ionicons name="barbell" size={28} color="#FF6B00" />
-            <Text style={styles.logoText}>TIME FIT</Text>
-          </View>
-          <Text style={styles.subtitle}>Tu Tiempo, Tu Fuerza</Text>
-        </View>
-
-        {/* Form Section */}
-        <View style={styles.formSection}>
-          <Text style={styles.formTitle}>Crear tu cuenta</Text>
-
-          {/* Nombre Input */}
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="Nombre"
-              placeholderTextColor="#999"
-              value={formData.nombre}
-              onChangeText={(value) => handleInputChange('nombre', value)}
-              autoCapitalize="words"
-              autoCorrect={false}
-            />
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardContainer}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      >
+        <ScrollView 
+          contentContainerStyle={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Logo Section */}
+          <View style={styles.logoSection}>
+            <View style={styles.logoContainer}>
+              <Ionicons name="barbell" size={28} color="#FF6B00" />
+              <Text style={styles.logoText}>TIME FIT</Text>
+            </View>
+            <Text style={styles.subtitle}>Tu Tiempo, Tu Fuerza</Text>
           </View>
 
-          {/* Apellido Input */}
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="Apellido"
-              placeholderTextColor="#999"
-              value={formData.apellido}
-              onChangeText={(value) => handleInputChange('apellido', value)}
-              autoCapitalize="words"
-              autoCorrect={false}
-            />
-          </View>
+          {/* Form Section */}
+          <View style={styles.formSection}>
+            <Text style={styles.formTitle}>Crear tu cuenta</Text>
 
-          {/* Nombre de Usuario Input */}
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="Nombre de usuario"
-              placeholderTextColor="#999"
-              value={formData.nombreUsuario}
-              onChangeText={(value) => handleInputChange('nombreUsuario', value)}
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-          </View>
-
-          {/* Email Input */}
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="Correo electrónico"
-              placeholderTextColor="#999"
-              value={formData.correo}
-              onChangeText={(value) => handleInputChange('correo', value)}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-          </View>
-
-          {/* Password Input */}
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={[styles.input, styles.passwordInput]}
-              placeholder="Contraseña"
-              placeholderTextColor="#999"
-              value={formData.contrasena}
-              onChangeText={(value) => handleInputChange('contrasena', value)}
-              secureTextEntry={!showPassword}
-              autoCapitalize="none"
-            />
-            <TouchableOpacity
-              style={styles.eyeButton}
-              onPress={() => setShowPassword(!showPassword)}
-            >
-              <Ionicons
-                name={showPassword ? "eye-off" : "eye"}
-                size={20}
-                color="#999"
+            {/* Nombre Input */}
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Nombre"
+                placeholderTextColor="#999"
+                value={formData.nombre}
+                onChangeText={(value) => handleInputChange('nombre', value)}
+                autoCapitalize="words"
+                autoCorrect={false}
+                returnKeyType="next"
               />
-            </TouchableOpacity>
-          </View>
+            </View>
 
-          {/* Confirm Password Input */}
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={[styles.input, styles.passwordInput]}
-              placeholder="Confirmar contraseña"
-              placeholderTextColor="#999"
-              value={formData.confirmarContrasena}
-              onChangeText={(value) => handleInputChange('confirmarContrasena', value)}
-              secureTextEntry={!showConfirmPassword}
-              autoCapitalize="none"
-            />
-            <TouchableOpacity
-              style={styles.eyeButton}
-              onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-            >
-              <Ionicons
-                name={showConfirmPassword ? "eye-off" : "eye"}
-                size={20}
-                color="#999"
+            {/* Apellido Input */}
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Apellido"
+                placeholderTextColor="#999"
+                value={formData.apellido}
+                onChangeText={(value) => handleInputChange('apellido', value)}
+                autoCapitalize="words"
+                autoCorrect={false}
+                returnKeyType="next"
               />
+            </View>
+
+            {/* Nombre de Usuario Input */}
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Nombre de usuario"
+                placeholderTextColor="#999"
+                value={formData.nombreUsuario}
+                onChangeText={(value) => handleInputChange('nombreUsuario', value)}
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="next"
+              />
+            </View>
+
+            {/* Email Input */}
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Correo electrónico"
+                placeholderTextColor="#999"
+                value={formData.correo}
+                onChangeText={(value) => handleInputChange('correo', value)}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="next"
+              />
+            </View>
+
+            {/* Password Input */}
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={[styles.input, styles.passwordInput]}
+                placeholder="Contraseña"
+                placeholderTextColor="#999"
+                value={formData.contrasena}
+                onChangeText={(value) => handleInputChange('contrasena', value)}
+                secureTextEntry={!showPassword}
+                autoCapitalize="none"
+                returnKeyType="next"
+              />
+              <TouchableOpacity
+                style={styles.eyeButton}
+                onPress={() => setShowPassword(!showPassword)}
+              >
+                <Ionicons
+                  name={showPassword ? "eye-off" : "eye"}
+                  size={20}
+                  color="#999"
+                />
+              </TouchableOpacity>
+            </View>
+
+            {/* Confirm Password Input */}
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={[styles.input, styles.passwordInput]}
+                placeholder="Confirmar contraseña"
+                placeholderTextColor="#999"
+                value={formData.confirmarContrasena}
+                onChangeText={(value) => handleInputChange('confirmarContrasena', value)}
+                secureTextEntry={!showConfirmPassword}
+                autoCapitalize="none"
+                returnKeyType="done"
+              />
+              <TouchableOpacity
+                style={styles.eyeButton}
+                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                <Ionicons
+                  name={showConfirmPassword ? "eye-off" : "eye"}
+                  size={20}
+                  color="#999"
+                />
+              </TouchableOpacity>
+            </View>
+
+            {/* Register Button */}
+            <TouchableOpacity 
+              style={[styles.registerButton, loading && styles.registerButtonDisabled]} 
+              onPress={() => {
+                console.log('👆 Botón presionado');
+                handleRegister();
+              }}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#FFFFFF" size="small" />
+              ) : (
+                <Text style={styles.registerButtonText}>Crear cuenta</Text>
+              )}
             </TouchableOpacity>
+
+            {/* Login Link */}
+            <View style={styles.loginSection}>
+              <Text style={styles.loginQuestion}>¿Ya tienes cuenta?</Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                <Text style={styles.loginLink}>Iniciar sesión</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-
-          {/* Register Button */}
-          <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
-            <Text style={styles.registerButtonText}>Crear Cuenta</Text>
-          </TouchableOpacity>
-
-          {/* Google Register Button */}
-          <TouchableOpacity style={styles.googleButton} onPress={handleGoogleRegister}>
-            <Text style={styles.googleButtonText}>G</Text>
-            <Text style={styles.googleButtonLabel}>Registrarte con Google</Text>
-          </TouchableOpacity>
-
-          {/* Login Link */}
-          <View style={styles.loginSection}>
-            <Text style={styles.loginQuestion}>¿Ya tienes cuenta?</Text>
-            <TouchableOpacity onPress={()=> rutas.replace("Login")}>
-              <Text style={styles.loginLink}>Iniciar Sesión</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -262,6 +291,11 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingBottom: 40, // Add more padding at the bottom for better spacing
+  },
+  keyboardContainer: {
     flex: 1,
   },
   logoSection: {
@@ -368,6 +402,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     paddingVertical: 12,
     textAlign: 'center',
+  },
+  registerButtonDisabled: {
+    opacity: 0.7,
   },
 });
 

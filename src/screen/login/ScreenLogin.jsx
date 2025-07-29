@@ -8,6 +8,9 @@ import {
   SafeAreaView,
   StatusBar,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../../context/authContext';
@@ -18,15 +21,37 @@ const ScreenLogin = ({ navigation }) => {
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useContext(AuthContext);
 
+  console.log('🧭 Login - Navegación disponible:', navigation ? 'Sí' : 'No');
+  console.log('🔍 Login - Contexto disponible:', login ? 'Sí' : 'No');
+
   const handleLogin = async () => {
+    console.log('🔄 Botón de login presionado');
+    console.log('📧 Email:', email);
+    console.log('🔑 Password:', password ? '***' : 'Vacío');
+    console.log('🧭 Navegación disponible:', navigation ? 'Sí' : 'No');
+    
     if (!email || !password) {
+      console.log('❌ Campos vacíos');
       Alert.alert('Error', 'Por favor completa todos los campos');
       return;
     }
 
+    console.log('✅ Validación exitosa, iniciando login...');
     try {
-      await login(email, password); 
+      console.log('📤 Llamando función login...');
+      await login(email, password);
+      console.log('✅ Login exitoso, navegando al home...');
+      
+      // Navegar directamente al home después del login exitoso
+      console.log('🧭 Intentando navegar a MainTabs...');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'MainTabs' }],
+      });
+      console.log('✅ Navegación ejecutada');
+      
     } catch (err) {
+      console.log('❌ Error en login:', err.message);
       Alert.alert('Login fallido', err.message);
     }
   };
@@ -35,69 +60,83 @@ const ScreenLogin = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#000000" />
 
-      {/* Logo Section */}
-      <View style={styles.logoSection}>
-        <View style={styles.logoContainer}>
-          <Ionicons name="barbell" size={32} color="#FF6B00" />
-          <Text style={styles.logoText}>TIME FIT</Text>
-        </View>
-        <Text style={styles.subtitle}>Tu Tiempo, Tu Fuerza</Text>
-      </View>
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardContainer}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      >
+        <ScrollView 
+          contentContainerStyle={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Logo Section */}
+          <View style={styles.logoSection}>
+            <View style={styles.logoContainer}>
+              <Ionicons name="barbell" size={32} color="#FF6B00" />
+              <Text style={styles.logoText}>TIME FIT</Text>
+            </View>
+            <Text style={styles.subtitle}>Tu Tiempo, Tu Fuerza</Text>
+          </View>
 
-      {/* Form Section */}
-      <View style={styles.formSection}>
-        <Text style={styles.formTitle}>Acceder a tu cuenta</Text>
+          {/* Form Section */}
+          <View style={styles.formSection}>
+            <Text style={styles.formTitle}>Acceder a tu cuenta</Text>
 
-        {/* Email Input */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="E-mail"
-            placeholderTextColor="#999"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-        </View>
+            {/* Email Input */}
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="E-mail"
+                placeholderTextColor="#999"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="next"
+              />
+            </View>
 
-        {/* Password Input */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={[styles.input, styles.passwordInput]}
-            placeholder="Contraseña"
-            placeholderTextColor="#999"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={!showPassword}
-            autoCapitalize="none"
-          />
-          <TouchableOpacity
-            style={styles.eyeButton}
-            onPress={() => setShowPassword(!showPassword)}
-          >
-            <Ionicons
-              name={showPassword ? 'eye-off' : 'eye'}
-              size={20}
-              color="#999"
-            />
-          </TouchableOpacity>
-        </View>
+            {/* Password Input */}
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={[styles.input, styles.passwordInput]}
+                placeholder="Contraseña"
+                placeholderTextColor="#999"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                autoCapitalize="none"
+                returnKeyType="done"
+              />
+              <TouchableOpacity
+                style={styles.eyeButton}
+                onPress={() => setShowPassword(!showPassword)}
+              >
+                <Ionicons
+                  name={showPassword ? 'eye-off' : 'eye'}
+                  size={20}
+                  color="#999"
+                />
+              </TouchableOpacity>
+            </View>
 
-        {/* Login Button */}
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Entrar</Text>
-        </TouchableOpacity>
+            {/* Login Button */}
+            <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+              <Text style={styles.loginButtonText}>Entrar</Text>
+            </TouchableOpacity>
 
-        {/* Register Link */}
-        <View style={styles.registerSection}>
-          <Text style={styles.registerQuestion}>¿Aún no tienes cuenta?</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('CrearCuenta')}>
-            <Text style={styles.registerLink}>Registrarte</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+            {/* Register Link */}
+            <View style={styles.registerSection}>
+              <Text style={styles.registerQuestion}>¿Aún no tienes cuenta?</Text>
+              <TouchableOpacity onPress={() => navigation.navigate('CrearCuenta')}>
+                <Text style={styles.registerLink}>Registrarte</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -105,6 +144,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000000',
+  },
+  keyboardContainer: {
+    flex: 1,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingBottom: 20, // Add some padding at the bottom for the register link
   },
   header: {
     paddingHorizontal: 20,
